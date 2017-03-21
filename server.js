@@ -98,9 +98,19 @@ app.get('/:articleName',function(req,res){
 res.send(createTemplate(articles[articleName])); 
 });
 var counter=0;
-app.get('/counter',function(req,res){
+app.get('/counter', function(req,res){
     counter=counter+1;
     res.send(counter.toString());
+});
+
+var names=[];   
+app.get('/submit-name/:name',function(req,res){
+   //Get the name from the request
+   var name=req.params.name;
+   
+   names.push(name);
+   //JSON:Javascript Object Notation...to convert object into string 
+   res.send(JSON.stringfy(names));
 });
 app.get('/ui/main.js',function(req,res){
     res.sendFile(path.join(__dirname,'ui','main.js'));
