@@ -48,38 +48,6 @@ app.get('/submit-name/:name',function(req,res){
    res.send(JSON.stringfy(names));
 });
 
-var articles={
-   'article-one': {
-	title:'Article One | Prashant Mishra',
-	heading:'Article One',
-	date:'Mar 20,2017',
-	content:`    
-	<p>
-		Asbahhhhhhhhhhha ssssssssdas sd
-	</p>`
-   },//javascript object
-   
-   'article-two':{
-	title:'Article Two | Prashant Mishra',
-	heading:"Article Two",
-	date:'Mar 21,2017',
-	content:`    
-	<p>
-		Asbahhhhhhhhhhha ssssssssdas sd
-	</p>`
-   },//javascript object
-
-   'article-three':{
-	title:'Article Three | Prashant Mishra',
-	heading:"Article Three",
-	date:'Mar 22,2017',
-	content:`    
-	<p>
-		Asbahhhhhhhhhhha ssssssssdas sd
-	</p>`
-   }//javascript object
-};
-
 //object for html template
 function createTemplate(data){
 	var title=data.title;
@@ -142,7 +110,7 @@ app.get('/article/:articleName',function(req,res){
    //article data object var articleData
    
    //select a particular article WhERE title='\';DELETE from article where a=\'asdf
-   pool.query("SELECT * FROM article WHERE title= $1"+[req.params.articleName]+"'",function(err,result){
+   pool.query("SELECT * FROM article WHERE title= $1",[req.params.articleName],function(err,result){
        //once we get the result
        if(err){
            res.status(500).send(err.toString());
