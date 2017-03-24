@@ -4,6 +4,33 @@ var path = require('path');
 
 var app = express();
 app.use(morgan('combined'));
+var Pool=require('pg').Pool;
+var config={
+    host:'db.imad.hasura-app.io',
+    user:'mishra-p',
+    port:'5432', 
+    database:'mishra-p',
+    password:process.env.DB_PASSWORD
+};
+
+// create the pool somewhere globally so its lifetime
+// lasts for as long as your app is running
+ var pool = new Pool(config);
+
+app.get('/test-db',function(req,res){
+    //make a select request
+    
+    //return a response with the results
+    pool.query('SELECT * from test', function(err,result){
+        //in case of error
+        if(err){
+            res.status(500).send(err.toString());
+        }
+        else{
+            res.send(JASON.stringfy(result));
+        }
+    });
+});
 
 var counter=0;
 app.get('/counter', function(req,res){
@@ -17,7 +44,7 @@ app.get('/submit-name/:name',function(req,res){
    var name=req.params.name;
    
    names.push(name);
-   //JSON:Javascript Object Notation...to convert object into string 
+   //JSON:Javascript Object No tation...to convert object into string 
    res.send(JSON.stringfy(names));
 });
 
@@ -107,12 +134,14 @@ var htmlTemplate= `
 app.get('/', function (req, res) {
   res.sendFile(path  .join(__dirname, 'ui', 'index.html'));
 });
+
 app.get('/:articleName',function(req,res){
 	//articleName==article-one 
 	//article[articleName]==content object for article one  
    var articleName=req.params.articleName;   
 res.send(createTemplate(articles[articleName])); 
 });
+
 app.get('/ui/main.js',function(req,res){
     res.sendFile(path.join(__dirname,'ui','main.js'));
 });
