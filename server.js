@@ -1,6 +1,7 @@
 var express = require('express');
 var morgan = require('morgan');
 var path = require('path');
+var crypto=require('crypto');//for hashing
 
 var app = express();
 app.use(morgan('combined'));
@@ -16,6 +17,17 @@ var config={
 // create the pool somewhere globally so its lifetime
 // lasts for as long as your app is running
  var pool = new Pool(config);
+
+function hash(input,salt){
+    var hashed=crypto.pbkdf2Sync(input,salt,10000,512,'sha512');
+    return hashed.toString('hex');//hashed will be in a sequence of bytes so convert to string for readibility
+    
+}
+
+app.get('/hash/:input',function(req,res){
+    var hashedString=hash(req.params.input,'this-is-some-random-string');
+    res.send(hashedString);
+});
 
 app.get('/test-db',function(req,res){
     //make a select request
