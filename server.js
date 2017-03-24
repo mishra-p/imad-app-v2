@@ -142,7 +142,7 @@ app.get('/article/:articleName',function(req,res){
    //article data object var articleData
    
    //select a particular article
-   pool.query("SELECT * FROM article WHERE title="+req.params.articleName,function(err,result){
+   pool.query("SELECT * FROM article WHERE title= '"+req.params.articleName+"'",function(err,result){
        //once we get the result
        if(err){
            res.status(500).send(err.toString());
