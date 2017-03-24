@@ -114,7 +114,6 @@ var htmlTemplate= `
 </div>
   
 <div>
-    //to covert javascript date object to just data
 	${date.toDateString()}
 </div>
       
