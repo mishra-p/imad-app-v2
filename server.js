@@ -141,8 +141,8 @@ app.get('/article/:articleName',function(req,res){
    
    //article data object var articleData
    
-   //select a particular article
-   pool.query("SELECT * FROM article WHERE title= '"+req.params.articleName+"'",function(err,result){
+   //select a particular article WhERE title='\';DELETE from article where a=\'asdf
+   pool.query("SELECT * FROM article WHERE title= $1"+[req.params.articleName]+"'",function(err,result){
        //once we get the result
        if(err){
            res.status(500).send(err.toString());
