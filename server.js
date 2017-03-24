@@ -20,7 +20,7 @@ var config={
 app.get('/test-db',function(req,res){
     //make a select request
     
-    //return a response with the results
+    //return   a response with the results
     pool.query('SELECT * from test', function(err,result){
         //in case of error
         if(err){
@@ -134,12 +134,31 @@ var htmlTemplate= `
 app.get('/', function (req, res) {
   res.sendFile(path  .join(__dirname, 'ui', 'index.html'));
 });
-
-app.get('/:articleName',function(req,res){
+ 
+app.get('/article/:articleName',function(req,res){
 	//articleName==article-one 
 	//article[articleName]==content object for article one  
-   var articleName=req.params.articleName;   
-res.send(createTemplate(articles[articleName])); 
+   
+   //article data object var articleData
+   
+   //select a particular article
+   pool.query("SELECT * FROM article WHERE title="+req.params.articleName,function(err,result){
+       //once we get the result
+       if(err){
+           res.status(500).send(err.toString());
+       }
+       else
+       {
+           //if no such title existed in db
+           if(result.rows.length===0)
+           res.status(404).send('Article not found');
+            else{ //if article is there
+                var articleData=result.rows[0];
+                res.send(createTemplate(articleData)); 
+            }
+           
+       }
+   });
 });
 
 app.get('/ui/main.js',function(req,res){
