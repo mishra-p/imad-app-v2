@@ -116,6 +116,13 @@ app.get('/check-login',function(){
     res.send("You are not logged in");
 });
 
+app.get('/logout',function(req,res){
+    //removing the auth obj from session object so that we are not storing the session anymore
+    delete req.session.auth;
+    res.send('Logged out');
+
+});
+
 app.get('/test-db',function(req,res){
     //make a select request
     
