@@ -2,9 +2,13 @@ var express = require('express');
 var morgan = require('morgan');
 var path = require('path');
 var crypto=require('crypto');//for hashing
+//telling the express framework to look for the jason in the request body and the req body will be a jason using body parser, an express library
+var bodyParser=require('body-parser');
 
 var app = express();
 app.use(morgan('combined'));
+//telling bodyparser that for every incoming request,in case it sees jason content, then load the content in req.body variable
+app.use(bodyParser,jason());
 var Pool=require('pg').Pool;
 var config={
     host:'db.imad.hasura-app.io',
@@ -36,8 +40,10 @@ app.get('/hash/:input',function(req,res){
 app.post('/create-user',function(req,res){
     
     //extracting username,password from the request body
+    //using JASON request for getting data in req body
     var username=req.body.username;
     var password=req.body.password;
+    
     var salt=crypto.getRandomBytes(128).toString('hex');
     
     var dbString=hash(password,salt);
