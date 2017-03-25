@@ -41,10 +41,11 @@ app.post('/create-user',function(req,res){
     
     //extracting username,password from the request body
     //using JASON request for getting data in req body
+    //{"username":"prashant", "password:" "password"}<- a POST request looks like this and it is the JASON object that will convert into right username password
     var username=req.body.username;
     var password=req.body.password;
     
-    var salt=crypto.getRandomBytes(128).toString('hex');
+    var salt=crypto.randomBytes(128).toString('hex');
     
     var dbString=hash(password,salt);
     pool.query('INSERT INTO "user" (username,password) VALUES ($1,$2)',[username,dbString],function(req,res){
