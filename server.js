@@ -20,10 +20,11 @@ var config={
 
 function hash(input,salt){
     //here 512 means the hashed password will be a 512 byte string
-    //the function takes the value <input> and appends with salt and applies the hash function 10000 times on it
+    //the function takes the value <input> and appends with salt and applies the hash function 10000 times on the new string formed
+    //if input is "password" then-> password-this-is-some-random->hash-> again hashed for 10000 times
     //random values of salt is used for making hashed password more secure
     var hashed=crypto.pbkdf2Sync(input,salt,10000,512,'sha512');
-    return hashed.toString('hex');//hashed will be in a sequence of bytes so convert to string for readibility
+    return["pbkdf2Sync","10000",salt,hashed.toString('hex')];//hashed will be in a sequence of bytes so convert to string for readibility
     
 }
 
