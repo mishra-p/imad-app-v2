@@ -1,43 +1,36 @@
-//Counter code
-var button=document.getElementById('counter');
-button.onclick=function(){
-    //Create a request object to the counter endpoint
-    var request=new XMLHttpRequest();
-    //Capture the response and store it in a variable
-    request.onreadystatechange=function(){
-        if(request.readyState===XMLHttpRequest.DONE){
-            //Take some action
-            if(request.status===200){
-                var counter=request.responseText;
-                var span=document.getElementById('count');
-                span.innerHTML=counter.toString();
-            }
-         }
-        };
-        //Make the request
-        request.open('GET','http://mishra-p.imad.hasura-app.io/counter',true);
-        request.send(null);
- };
- 
- //Submit name
- var nameInput=document.getElementById('name');
- var name=nameInput.value;
+
+ //Submit username/password to login
  var submit=document.getElementById('submit_btn');
  submit.onclick=function(){
-     //Make a request to the server and send the name
+     //Create a request object
+     var request=new XMLHttpRequest();
      
-     //Capture a list of names and render it as a list
-     var names=['name1','name2','name3','name4'];
-     var list='';
-     for(var i=0;i<names.length;i++)
-        list+='<li>'+names[i]+'<li>';
+     //Capture the response and store it in a variable
+     request.onreadystatechange=function(){
+       if(request.readyState===XMLHttpRequest.DONE){
+           if(request.status===200){
+               alert('Logged in successfully');
+           }
+           else if(request.status===403){
+               alert('Username/password is incorrect');
+           }
+           else if(request.status===500){
+               alert('Something went wrong with the server');
+           }
+       }  
+     };
  };
- var ul=document.getElementById('nameList');
- ul.innerHTML=list;
+
+ //Make the request
+ var username=document.getElementById('username').value;
+ var password=document.getElementById('password').value;
+ request.open('POST','http://mishra-p.imad.hasura-app.io/login',true);
  
+ //setting the http header for content type to be json
+ request.setRequestHeader('Content-Type','application/json');
  
- 
- 
+ //sending the data,name and password-> a json string by converting the object into string 
+ request.send(JSON.stringify({username:username, password:password}));
  
  
  
