@@ -1,15 +1,13 @@
 var express = require('express');
 var morgan = require('morgan');
 var path = require('path');
-var crypto=require('crypto');//for hashing
-//telling the express framework to look for the jason in the request body and the req body will be a jason using body parser, an express library
-var bodyParser=require('body-parser');
-
-var app = express();
-app.use(morgan('combined'));
-//telling bodyparser that for every incoming request,in case it sees jason content, then load the content in req.body variable
-app.use(bodyParser,json());
 var Pool=require('pg').Pool;
+var crypto=require('crypto');//for hashing
+/*telling the express framework to look for the jason in the request body and the req body will be a jason using body parser, an express library*/
+var bodyParser=require('body-parser');
+/*using express session library for cookies*/
+var session=require('express-session');
+
 var config={
     host:'db.imad.hasura-app.io',
     user:'mishra-p',
@@ -17,6 +15,17 @@ var config={
     database:'mishra-p',
     password:process.env.DB_PASSWORD
 };
+
+var app = express();
+app.use(morgan('combined'));
+/*telling bodyparser that for every incoming request,in case it sees jason content, then load the content in req.body variable*/
+app.use(bodyParser.json()); 
+//telling express to use the session library
+app.use(session({
+    //secret is the value used to encrypt the cookies with
+    secret:'someRandomSecretValue',
+    cookie:{maxAge: 1000*60*60*24*30 }//telling the session library the cookie age
+}));
 
 // create the pool somewhere globally so its lifetime
 // lasts for as long as your app is running
@@ -78,6 +87,16 @@ app.post('/login',function(req,res){
                     var salt=dbString.split('$')[2]; //getting the salt value from dbString
                     var hashedPassword=hash(password,salt);//creating a hash based on the original salt and the password submitted
                     if(hashedPassword===dbString){
+                         //set the session value before sending the response
+                         //Assuming that there is a session object on the request which is been created by session library
+                         /*There is a key called auth inside the session object that will map to userId:result.row[0].id object and this object says that there is a userId whose value is equal to the value of the that it  got from the user database*/
+                         req.session.auth={userId:result.row[0].id};
+                         //The above is setting the cookie with session id that it is randomly generating
+                         //internally on the server side it maps the session id to an object
+                        //{auth:{userId}}
+                         //this object contains the value called auth which further contains another obj, userId object
+                         //all this info is maintained in the server side
+                         //all that the cookie contain is the session id
                          res.send('credentials are correct');
                     }
                     else
@@ -86,6 +105,15 @@ app.post('/login',function(req,res){
             }
 
     });
+});
+
+//checking whether session is working or not
+app.get('/check-login',function(){
+    if(req.session && req.session.auth &&req.session.auth.userId){
+        res.send('You are logged in: '+req.session.auth.userId.toString());
+    }
+    else
+    res.send("You are not logged in");
 });
 
 app.get('/test-db',function(req,res){
