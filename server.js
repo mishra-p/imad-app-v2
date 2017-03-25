@@ -28,7 +28,7 @@ function hash(input,salt){
     //if input is "password" then-> password-this-is-some-random->hash-> again hashed for 10000 times
     //random values of salt is used for making hashed password more secure
     var hashed=crypto.pbkdf2Sync(input,salt,10000,512,'sha512');
-    return["pbkdf2Sync","10000",salt,hashed.toString('hex')];//hashed will be in a sequence of bytes so convert to string for readibility
+    return["pbkdf2Sync","10000",salt,hashed.toString('hex')].join('$');//hashed will be in a sequence of bytes so convert to string for readibility
     
 }
 
@@ -48,7 +48,7 @@ app.post('/create-user',function(req,res){
     var salt=crypto.randomBytes(128).toString('hex');
     
     var dbString=hash(password,salt);
-    pool.query('INSERT INTO "user" (username,password) VALUES ($1,$2)',[username,dbString],function(req,res){
+    pool.query('INSERT INTO "user" (username,password) VALUES ($1,$2)',[username,dbString],function(err,result){
             if(err){
                 res.status(500).send(err.toString());
              }
@@ -62,13 +62,29 @@ app.post('/login',function(req,res){
      var username=req.body.username;
      var password=req.body.password;
     
-    pool.query('SELECT * FROM "user" username=$1',[username],function(req,res){
+    pool.query('SELECT * FROM "user" username=$1',[username],function(err,result){
             if(err){
                 res.status(500).send(err.toString());
              }
             else{
-                res.send('User successfully created'+username);
+                if(result.rows.length===0)
+                    res.send(403).send('user/password is invalid');
+                else{
+                    // Match the password
+                    var dbString=result.rows[0].password;
+                    
+                    //split function to split by dollar the password stored in database
+                    //dbString.split('$');//the value of this will be same as the value returned by hash funct
+                    var salt=dbString.split('$')[2]; //getting the salt value from dbString
+                    var hashedPassword=hash(password,salt);//creating a hash based on the original salt and the password submitted
+                    if(hashedPassword===dbString){
+                         res.send('credentials are correct');
+                    }
+                    else
+                        res.send(403).send('user/password is invalid');
+                }
             }
+
     });
 });
 
