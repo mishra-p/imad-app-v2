@@ -8,7 +8,7 @@ var bodyParser=require('body-parser');
 var app = express();
 app.use(morgan('combined'));
 //telling bodyparser that for every incoming request,in case it sees jason content, then load the content in req.body variable
-app.use(bodyParser,jason());
+app.use(bodyParser,json());
 var Pool=require('pg').Pool;
 var config={
     host:'db.imad.hasura-app.io',
